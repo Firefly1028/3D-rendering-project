@@ -28,6 +28,11 @@ def matVecMul(matrix, vector):
     m = vecToMatrix(vector)
     return np.matmul(matrix, m)
 
+def matVecMulToVec(matrix: list, vector: list):
+    m = matVecMul(matrix, vector)
+    return matrixToVec(m)
+
+
 def setup(v, projection):
     result = matVecMul(projection, v) #Multiplies the projection and the point (previousy v, but has now been converted to a matrix named 'point')
     v = matrixToVec(result) #Converts the result into a new vector and stores it 'v'
