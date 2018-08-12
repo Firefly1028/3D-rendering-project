@@ -59,7 +59,7 @@ function draw() {
 		//Projects the rotated points from 3D to 2D
 		var projected2d = matToVec3(matmul(projection, rotated));
 		//Finally draws the new points onto the screen
-		ellipse(projected2d[0] + 940, projected2d[1] + 480, 20);
+    ellipse(projected2d[0] + windowWidth/2, projected2d[1] + windowHeight/2, 20);
 	}
 	angle += 0.01;
 }
