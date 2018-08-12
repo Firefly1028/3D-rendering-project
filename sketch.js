@@ -1,39 +1,70 @@
-function setup() {
+var angle = 0;
+
+//Creates the canvas
+ function setup() {
 	createCanvas(windowWidth, windowHeight);
 }
 
-var angle = 0;
-var projected2d = new Array();
-var rotated = new Array();
+//Resizes the canvas when the user's window is resized
+function windowResized(){
+	resizeCanvas(windowWidth, windowHeight);
+}
 
 function draw() {
-
+//Creates the distance between the points
 	var points = [
-		[windowWidth/2-200, windowHeight/2-200, 0],
-		[windowWidth/2-200, windowHeight/2+200, 0],
-		[windowWidth/2+200, windowHeight/2-200, 0],
-		[windowWidth/2+200, windowHeight/2+200, 0]
+		[-200, -200, 200],
+		[-200, 200, 200],
+		[200, -200, 200],
+		[200, 200, 200],
+		[-200, -200, -200],
+		[-200, 200, -200],
+		[200, -200, -200],
+		[200, 200, -200]
 	];
 
-	var rotation = [
-		[Math.cos(angle), -Math.sin(angle)],
-		[Math.sin(angle), Math.cos(angle)]
+//Matrices for rotation around the x, y, and z axes
+	var rotationX = [
+		[1, 0, 0],
+		[0, Math.cos(angle), -Math.sin(angle)],
+		[0, Math.sin(angle), Math.cos(angle)]
 	];
 
+	var rotationY = [
+		[Math.cos(angle), 0, Math.sin(angle)],
+		[0, 1, 0],
+		[-Math.sin(angle), 0, Math.cos(angle)]
+	];
+
+	var rotationZ = [
+		[Math.cos(angle), -Math.sin(angle), 0],
+		[Math.sin(angle), Math.cos(angle), 0],
+		[0, 0, 1]
+	];
+
+//Martix for projecting the 3D points into 2D
 	var projection = [
 		[1, 0, 0],
 		[0, 1, 0]
 	];
 
+//Sets background to black
 	background(0);
+
 	for (p of points){
-		var projected2d = matmul(projection, vecToMat(p));
-		var rotated = matToVec3(matmul(rotation, projected2d));
-		ellipse(rotated[0], rotated[1], 20);
+		//Rotates the points around all axes
+		var rotated = matmul(rotationX, vecToMat(p));
+		rotated = matmul(rotationY, rotated);
+		rotated = matmul(rotationZ, rotated);
+		//Projects the rotated points from 3D to 2D
+		var projected2d = matToVec3(matmul(projection, rotated));
+		//Finally draws the new points onto the screen
+		ellipse(projected2d[0] + 940, projected2d[1] + 480, 20);
 	}
 	angle += 0.01;
 }
 
+//Converts a vector into a matrix. Vector can be of any length
 function vecToMat(v){
 	var m = new Array();
 	var i = 0;
@@ -45,6 +76,7 @@ function vecToMat(v){
 	return m;
 }
 
+//Converts a matrix into either a vector 2 or a vector 3. No more and no less.
 function matToVec3(m){
 	v = Array();
 	v.push(m[0][0]);
@@ -52,7 +84,7 @@ function matToVec3(m){
 	if(m.length > 2){
 			v.push(m[2][0]);
 	}
-	return v
+	return v;
 }
 
 /* Using a function I got off of Google because I'm too dumb to comprehend
@@ -72,6 +104,9 @@ function matmul(a, b) {
   }
   return m;
 }
+
+//My matmul function which will need more attention later on so I can use my own
+//matmul function, rather than one I found from Google.
 
 // function matmul(a, b){
 // 	var colsA = a[0].length;
