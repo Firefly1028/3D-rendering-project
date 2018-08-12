@@ -61,7 +61,7 @@ function draw() {
 		//Finally draws the new points onto the screen
     ellipse(projected2d[0] + windowWidth/2, projected2d[1] + windowHeight/2, 20);
 	}
-	angle += 0.01;
+	angle += 0.02;
 }
 
 //Converts a vector into a matrix. Vector can be of any length
