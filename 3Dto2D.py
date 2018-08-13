@@ -2,30 +2,30 @@ import pyxel
 import numpy as np
 
 points = [
-    [-25, -25, 25],
-    [25, -25, 25],
-    [-25, 25, 25],
-    [25, 25, 25],
-    [-25, -25, -25],
-    [25, -25, -25],
-    [-25, 25, -25],
-    [25, 25, -25]
+    [-0.5, -0.5, 0.5],
+    [0.5, -0.5, 0.5],
+    [-0.5, 0.5, 0.5],
+    [0.5, 0.5, 0.5],
+    [-0.5, -0.5, -0.5],
+    [0.5, -0.5, -0.5],
+    [-0.5, 0.5, -0.5],
+    [0.5, 0.5, -0.5]
 ]
 
-projection = [
-    [1, 0, 0],
-    [0, 1, 0]
-]
+xscale = 100
+yscale = 100
+
 
 
 class Cube:
     """Draw the cube onto the 2D screen. 
     Enter a matrix of coordinates for points.
     Enter a projection matrix for projectMat"""
-    def __init__(self, points, projectMat):
+    def __init__(self, points, scaleX, scaleY):
         self.points = points
         self.angle = 0
-        self.projectMat = projectMat
+        self.scaleX = scaleX
+        self.scaleY = scaleY
         self.projection2d = []
         self.rotated = []
 
@@ -53,15 +53,46 @@ class Cube:
 
     def draw(self):
         pyxel.cls(0)
-        
+
+        projected = []
+        i = 0
+
         for p in self.points:
             self.rotated = np.matmul(self.rotationX, vecToMat(p))
             self.rotated = np.matmul(self.rotationY, self.rotated)
             self.rotated = np.matmul(self.rotationZ, self.rotated)
-            self.projection2d = matToVec(np.matmul(self.projectMat, self.rotated))
+            dist = 1 / (1.25 - self.rotated[2])
+            projection = [
+                [dist, 0, 0],
+                [0, dist, 0]
+            ]
+            self.projection2d = matToVec(np.matmul(projection, self.rotated))
+            self.projection2d[0] = self.projection2d[0] * self.scaleX
+            self.projection2d[1] = self.projection2d[1] * self.scaleY
+
+            projected.append(self.projection2d)
             pyxel.circ(self.projection2d[0] + pyxel.width/2, self.projection2d[1] + pyxel.height/2, 3, 7)
+            i += 1
+        
+        connect(0, 1, projected)
+        connect(0, 2, projected)
+        connect(0, 4, projected)
+        connect(1, 3, projected)
+        connect(1, 5, projected)
+        connect(2, 3, projected)
+        connect(2, 6, projected)
+        connect(3, 7, projected)
+        connect(4, 5, projected)
+        connect(4, 6, projected)
+        connect(5, 7, projected)
+        connect(6, 7, projected)
 
         self.angle += 0.02 # radians
+
+def connect(i, j, points):
+    a = points[i]
+    b = points[j]
+    pyxel.line(a[0] + pyxel.width/2, a[1] + pyxel.height/2, b[0] + pyxel.width/2, b[1] + pyxel.height/2, 8)
 
 def vecToMat(vector):
     m = []
@@ -75,4 +106,4 @@ def matToVec(matrix):
         v[i] = matrix[i][0]
     return v
 
-cube = Cube(points, projection)
+cube = Cube(points, xscale, yscale)
