@@ -11,8 +11,8 @@ function windowResized(){
 }
 
 function draw() {
-  var xscale = windowWidth + windowWidth/2 - windowHeight + windowHeight/2;
-  var yscale = windowWidth + windowWidth/2 - windowHeight + windowHeight/2;
+  var xscale = 200;
+  var yscale = 200;
 
 //Creates the distance between the points
 	var points = [
@@ -53,23 +53,28 @@ function draw() {
   var index = 0;
 	for (p of points){
 		//Rotates the points around all axes
-		var rotated = matmul(rotationX, vecToMat(p));
+    var rotated = Array();
+		rotated = matmul(rotationX, vecToMat(p));
 		rotated = matmul(rotationY, rotated);
 		rotated = matmul(rotationZ, rotated);
 
-    var dist = 1 / (5 - rotated[2]);
+    var dist = 5 / (2 - rotated[2]);
+
     //Martix for projecting the 3D points into 2D
   	var projection = [
   		[dist, 0, 0],
   		[0, dist, 0]
   	];
 
+
+
 		//Projects the rotated points from 3D to 2D
 		var projected2d = matToVec3(matmul(projection, rotated));
     projected2d[0] = projected2d[0] * xscale;
     projected2d[1] = projected2d[1] * yscale;
 		//Finally draws the new points onto the screen
-    ellipse(projected2d[0] + windowWidth/2, projected2d[1] + windowHeight/2, windowWidth / 75);
+    fill(244, 244, 244)
+    ellipse(projected2d[0] + windowWidth/2, projected2d[1] + windowHeight/2, 1 / (1 - rotated[2]) + 20);
     projected[index] = projected2d;
     index++;
 	}
@@ -90,14 +95,14 @@ function draw() {
   connect(1, 5, projected);
   connect(4, 5, projected);
 
-	angle += 0.02;
+	angle += 0.01;
 }
 
 function connect(i, j, points = Array()){
   var a = points[i];
   var b = points[j];
-  stroke(255);
-  strokeWeight(1);
+  stroke(244, 244, 244);
+  strokeWeight(10)
   line(a[0] + windowWidth/2, a[1] + windowHeight/2,
        b[0] + windowWidth/2, b[1] + windowHeight/2);
 }
